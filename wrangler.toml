@@ -1,0 +1,29 @@
+name = "tack"
+main = "src/worker.js"
+compatibility_date = "2026-09-01"
+
+# The landing page is a static asset; the Worker handles /p, /r, /api and /health first.
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = true
+
+# One Durable Object per stored page. Strongly consistent, so a link resolves the
+# instant it is handed out (KV would need up to ~60s to propagate).
+[[durable_objects.bindings]]
+name = "DOCS"
+class_name = "DocStore"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["DocStore"]
+
+# Per-IP deploy throttle (native rate limiting binding; no counter row in storage).
+[[unsafe.bindings]]
+name = "DEPLOY_LIMITER"
+type = "ratelimit"
+namespace_id = "2001"
+simple = { limit = 30, period = 60 }
+
+[observability]
+enabled = true
