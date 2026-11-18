@@ -18,6 +18,7 @@ HTML file.
 | Route | What you get |
 |---|---|
 | `GET /` | The editor UI |
+| `GET /docs` | The API reference page (`public/docs.html`) |
 | `POST /api/deploy` | Stores a page, returns `{id, editKey, preview, raw}` |
 | `GET /p/:id` | The rendered page (Markdown/plain text wrapped in a clean reading shell) |
 | `GET /r/:id` | The raw source as `text/plain` |

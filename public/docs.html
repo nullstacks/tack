@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>API · Tack</title>
+<meta name="description" content="Tack API reference: deploy a page, fetch it, delete it. Plain JSON, no keys.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232230F0'/%3E%3Cpath d='M9 5h10l5 5v17H9z' fill='%23fff'/%3E%3Cpath d='M19 5l5 5h-5z' fill='%23B8BFFF'/%3E%3Ccircle cx='16.5' cy='13' r='3.6' fill='%23FFD60A' stroke='%2312131A' stroke-width='1.6'/%3E%3Cpath d='M12.5 21h8M12.5 24h5' stroke='%232230F0' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2F3F8;--sheet:#fff;--ink:#12131A;--mute:#5A5E72;--line:#D9DBE6;--btn:#2230F0;--field:#2230F0;--hi:#FFD60A;--code:#F7F8FC;
+--d:'Bricolage Grotesque',system-ui,sans-serif;--b:'Hanken Grotesk',system-ui,sans-serif;--m:'JetBrains Mono',ui-monospace,Menlo,monospace;
+color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B0C11;--sheet:#14161F;--ink:#ECEDF5;--mute:#9A9FB6;--line:#262938;--btn:#4553FF;--field:#1822C4;--code:#0F1118;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B0C11;--sheet:#14161F;--ink:#ECEDF5;--mute:#9A9FB6;--line:#262938;--btn:#4553FF;--field:#1822C4;--code:#0F1118;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+@media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.65 var(--b);-webkit-font-smoothing:antialiased}
+*{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+::selection{background:var(--hi);color:#12131A}
+:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
+button{font:inherit;color:inherit;cursor:pointer}
+.i{width:1.1em;height:1.1em;flex:none}
+.shell{display:grid;grid-template-columns:minmax(300px,4fr) 8fr;min-height:100%;background:radial-gradient(circle,var(--line) 1px,transparent 1.3px) 0 0/24px 24px}
+.field{background:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px) 0 0/32px 32px,linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px) 0 0/32px 32px,var(--field);color:#fff;padding:clamp(24px,3.4vw,48px);display:flex;flex-direction:column;gap:28px;position:sticky;top:0;height:100dvh;align-self:start}
+.top{display:flex;justify-content:space-between;align-items:center}.tr{display:flex;gap:8px}
+.brand{display:flex;align-items:center;gap:10px;font:800 24px var(--d);letter-spacing:-.03em;color:#fff;text-decoration:none}
+.ib{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;padding:7px 12px;border-radius:6px;font:500 14px var(--b);text-decoration:none;white-space:nowrap}
+.ib:hover{border-color:#fff}
+h1{font:800 clamp(2.3rem,3.8vw,3.6rem)/.96 var(--d);letter-spacing:-.04em;margin:0}
+h1 mark{display:inline-block;background:var(--hi);color:#12131A;padding:0 .14em .04em;border-radius:4px;transform:rotate(-1.5deg);box-shadow:0 10px 18px -10px rgba(0,0,30,.6)}
+.pitch p{color:#E4E7FF;margin:16px 0 0;max-width:30ch}
+.toc{display:flex;flex-direction:column;gap:2px;overflow:auto;margin:0 -10px}
+.toc a{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;color:#E4E7FF;text-decoration:none;font:500 13.5px var(--m)}
+.toc a.l{font:600 14px var(--b)}
+.toc a:hover{background:rgba(255,255,255,.1)}.toc a.on{background:#fff;color:#12131A}
+.mt{font:700 10.5px var(--m);letter-spacing:.04em;padding:3px 7px;border-radius:3px;font-style:normal;background:color-mix(in srgb,var(--btn) 16%,transparent);color:var(--ink);min-width:3.9em;text-align:center}
+.toc .mt{background:rgba(255,255,255,.18);color:inherit}.toc a.on .mt{background:rgba(18,19,26,.1)}
+.mt.post,.toc .mt.post{background:var(--hi);color:#12131A}
+.mt.del{background:var(--ink);color:var(--sheet)}.toc .mt.del{background:transparent;box-shadow:inset 0 0 0 1px currentColor;color:inherit}
+main{padding:clamp(20px,4vw,64px);max-width:860px;width:100%;display:flex;flex-direction:column;gap:64px}
+section{scroll-margin-top:24px}
+h2{font:700 clamp(1.5rem,2.4vw,1.9rem)/1.15 var(--d);letter-spacing:-.025em;margin:0 0 12px}
+h3{font:700 13px var(--m);text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin:30px 0 10px}
+p{margin:0 0 14px;max-width:68ch}
+code{font:500 .88em var(--m);background:var(--code);padding:.12em .38em;border-radius:3px}
+.eh{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.eh code{background:none;padding:0;font:600 clamp(1.1rem,2.2vw,1.45rem) var(--m);letter-spacing:-.01em;word-break:break-all}
+.facts{display:grid;grid-template-columns:auto 1fr;margin:22px 0 0;border-top:1px solid var(--line)}
+.facts dt,.facts dd{margin:0;padding:12px 0;border-bottom:1px solid var(--line)}
+.facts dt{font:600 12px var(--m);text-transform:uppercase;letter-spacing:.05em;color:var(--mute);padding:15px 28px 0 0}
+.sheet{position:relative;background:var(--sheet);border:1px solid var(--line);border-radius:4px;margin:18px 10px 10px;padding:14px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;box-shadow:0 1px 2px rgba(18,19,26,.06),0 22px 44px -22px rgba(18,19,26,.3)}
+.sheet>b{font:700 15px var(--d)}.sheet .bu{flex:1 1 220px;font:500 15px var(--m);background:none;padding:0;overflow-wrap:anywhere}
+.m{position:absolute;width:14px;height:14px;border:0 solid var(--mute);pointer-events:none}
+.m.a{top:-9px;left:-9px;border-right-width:1px;border-bottom-width:1px}.m.b{top:-9px;right:-9px;border-left-width:1px;border-bottom-width:1px}
+.m.c{bottom:-9px;left:-9px;border-right-width:1px;border-top-width:1px}.m.d{bottom:-9px;right:-9px;border-left-width:1px;border-top-width:1px}
+.lang{display:flex;align-items:center;gap:12px;margin:26px 0 0;color:var(--mute);font-size:14px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;padding:2px}
+.seg button{border:0;background:transparent;padding:5px 12px;border-radius:4px;font:500 12.5px var(--m);color:var(--mute)}
+.seg button[aria-checked="true"]{background:var(--ink);color:var(--sheet)}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14.5px}
+th{text-align:left;font:600 11.5px var(--m);color:var(--mute);text-transform:uppercase;letter-spacing:.05em}
+td,th{padding:9px 14px 9px 0;border-top:1px solid var(--line);vertical-align:top}td:first-child{font:500 13px var(--m);white-space:nowrap}
+.ex{position:relative;margin:0 0 14px}
+.ex pre{margin:0;background:var(--code);border:1px solid var(--line);border-radius:6px;padding:16px 78px 16px 18px;overflow:auto;font:13px/1.65 var(--m);tab-size:2}
+.ex code{font:inherit;background:none;padding:0}
+.cp{position:absolute;top:8px;right:8px;border:1px solid var(--line);background:var(--sheet);border-radius:5px;padding:3px 10px;font:500 12px var(--b)}.cp:hover{border-color:var(--ink)}
+html[data-lang="curl"] .ex[data-l="js"],html[data-lang="js"] .ex[data-l="curl"]{display:none}
+.rl{margin:18px 0 6px;font-size:14px;color:var(--mute);display:flex;gap:8px;align-items:center}
+.st{font:600 12px var(--m);padding:2px 7px;border-radius:3px;font-style:normal;background:var(--code);border:1px solid var(--line);color:var(--ink)}
+.st.ok{background:color-mix(in srgb,var(--btn) 16%,transparent);border-color:transparent}
+.fin{color:var(--mute);font-size:14px;margin:0}.fin a{color:var(--ink)}
+@media(max-width:860px){.shell{grid-template-columns:1fr}.field{position:static;height:auto}.toc{flex-direction:row;flex-wrap:wrap;margin:0}.toc a{padding:5px 9px}.facts{grid-template-columns:1fr}.facts dt{padding:12px 0 0;border:0}.facts dd{padding-top:2px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="field">
+  <div class="top"><a class="brand" href="/"><svg width="28" height="28" viewBox="4 2 24 28" aria-hidden="true"><path d="M9 5h10l5 5v17H9z" fill="#fff"/><path d="M19 5l5 5h-5z" fill="#B8BFFF"/><circle cx="16.5" cy="13" r="3.6" fill="#FFD60A" stroke="#12131A" stroke-width="1.6"/><path d="M12.5 21h8M12.5 24h5" fill="none" style="stroke:var(--field)" stroke-width="1.6" stroke-linecap="round"/></svg>Tack</a><div class="tr"><a class="ib" href="/">Editor</a><button class="ib th" data-tt aria-label="Toggle theme"></button></div></div>
+  <div class="pitch"><h1>The <mark>API</mark></h1><p>Plain JSON over HTTPS. No keys, no accounts. Deploy a page, get two links.</p></div>
+  <nav class="toc" aria-label="API sections">
+    <a class="l" href="#overview">Overview</a>
+    <a href="#deploy"><i class="mt post">POST</i>/api/deploy</a>
+    <a href="#get-doc"><i class="mt">GET</i>/api/doc/:id</a>
+    <a href="#delete-doc"><i class="mt del">DELETE</i>/api/doc/:id</a>
+    <a href="#preview"><i class="mt">GET</i>/p/:id</a>
+    <a href="#raw"><i class="mt">GET</i>/r/:id</a>
+    <a href="#health"><i class="mt">GET</i>/health</a>
+    <a class="l" href="#errors">Errors &amp; limits</a>
+  </nav>
+</aside>
+<main>
+<section id="overview" data-sec>
+  <h2>Overview</h2>
+  <p>Tack stores one page per request and hands back two URLs: <code>/p/&lt;id&gt;</code> renders it and <code>/r/&lt;id&gt;</code> returns the source untouched. Everything here is plain HTTP and JSON.</p>
+  <div class="sheet"><i class="m a"></i><i class="m b"></i><i class="m c"></i><i class="m d"></i><b>Base URL</b><code class="bu">https://tack.nullstacks.workers.dev</code><button class="cp" style="position:static" data-cp=".bu">Copy</button></div>
+  <dl class="facts">
+    <dt>Format</dt><dd>JSON in, JSON out (<code>content-type: application/json</code>). The page routes <code>/p</code> and <code>/r</code> return HTML and plain text.</dd>
+    <dt>Auth</dt><dd>None to deploy or read. Deleting needs the edit key from the deploy response.</dd>
+    <dt>Ids</dt><dd>10 lowercase letters and digits. Pages are unlisted: you can only reach one if you know its id.</dd>
+    <dt>Limits</dt><dd>1 MB per page, 30 deploys per minute per IP.</dd>
+  </dl>
+  <div class="lang">Examples in <div class="seg" role="radiogroup" aria-label="Example language"><button role="radio" data-l="curl">curl</button><button role="radio" data-l="js">JavaScript</button></div></div>
+</section>
+
+<section id="deploy" data-sec>
+  <h2 class="eh"><i class="mt post">POST</i><code>/api/deploy</code></h2>
+  <p>Stores a page and returns its id, its two links and an edit key. The edit key is shown once; only its hash is stored, so keep it if you want to delete the page later.</p>
+  <h3>Body (JSON)</h3>
+  <div class="tw"><table><tr><th>Field</th><th>Type</th><th>Notes</th></tr>
+  <tr><td>content</td><td>string</td><td>Required. The page source, up to 1 MB of UTF-8. Whitespace only is rejected.</td></tr>
+  <tr><td>type</td><td>string</td><td><code>html</code>, <code>md</code> or <code>txt</code>. Anything else, or missing, is stored as <code>txt</code>.</td></tr>
+  <tr><td>name</td><td>string</td><td>Optional title. Trimmed and cut to 80 characters. Defaults to <code>Untitled</code>.</td></tr></table></div>
+  <h3>Example</h3>
+  <div class="ex" data-l="curl"><button class="cp">Copy</button><pre><code>curl -X POST <span class="bu">https://tack.nullstacks.workers.dev</span>/api/deploy \
+  -H 'content-type: application/json' \
+  -d '{"type":"md","name":"Hello","content":"# Hello from Tack"}'</code></pre></div>
+  <div class="ex" data-l="js"><button class="cp">Copy</button><pre><code>const res = await fetch('<span class="bu">https://tack.nullstacks.workers.dev</span>/api/deploy', {
+  method: 'POST',
+  headers: { 'content-type': 'application/json' },
+  body: JSON.stringify({ type: 'md', name: 'Hello', content: '# Hello from Tack' })
+});
+const { id, editKey, preview, raw } = await res.json();</code></pre></div>
+  <p class="rl"><i class="st ok">201</i>Created</p>
+  <div class="ex"><button class="cp">Copy</button><pre><code>{
+  "id": "k3m9x2qpa7",
+  "name": "Hello",
+  "type": "md",
+  "size": 17,
+  "ts": 1795000000000,
+  "editKey": "n4q8w2e7r5t3y6u9i2o5",
+  "preview": "/p/k3m9x2qpa7",
+  "raw": "/r/k3m9x2qpa7"
+}</code></pre></div>
+  <p><code>preview</code> and <code>raw</code> are paths: put the base URL in front of them. <code>size</code> is in bytes and <code>ts</code> is milliseconds since the Unix epoch. Failures are listed under <a href="#errors">Errors &amp; limits</a>.</p>
+</section>
+
+<section id="get-doc" data-sec>
+  <h2 class="eh"><i class="mt">GET</i><code>/api/doc/:id</code></h2>
+  <p>Returns a page&rsquo;s metadata and its content. The edit key hash is never included.</p>
+  <div class="ex" data-l="curl"><button class="cp">Copy</button><pre><code>curl <span class="bu">https://tack.nullstacks.workers.dev</span>/api/doc/k3m9x2qpa7</code></pre></div>
+  <div class="ex" data-l="js"><button class="cp">Copy</button><pre><code>const doc = await (await fetch('<span class="bu">https://tack.nullstacks.workers.dev</span>/api/doc/k3m9x2qpa7')).json();</code></pre></div>
+  <p class="rl"><i class="st ok">200</i>OK</p>
+  <div class="ex"><button class="cp">Copy</button><pre><code>{
+  "id": "k3m9x2qpa7",
+  "name": "Hello",
+  "type": "md",
+  "size": 17,
+  "ts": 1795000000000,
+  "content": "# Hello from Tack"
+}</code></pre></div>
+  <p>Responses are sent with <code>cache-control: no-store</code>. An unknown id returns <code>404</code>.</p>
+</section>
+
+<section id="delete-doc" data-sec>
+  <h2 class="eh"><i class="mt del">DELETE</i><code>/api/doc/:id</code></h2>
+  <p>Permanently deletes a page. Send the edit key from the deploy response in the <code>x-edit-key</code> header. A valid id alone is not enough.</p>
+  <div class="ex" data-l="curl"><button class="cp">Copy</button><pre><code>curl -X DELETE <span class="bu">https://tack.nullstacks.workers.dev</span>/api/doc/k3m9x2qpa7 \
+  -H 'x-edit-key: n4q8w2e7r5t3y6u9i2o5'</code></pre></div>
+  <div class="ex" data-l="js"><button class="cp">Copy</button><pre><code>await fetch('<span class="bu">https://tack.nullstacks.workers.dev</span>/api/doc/k3m9x2qpa7', {
+  method: 'DELETE',
+  headers: { 'x-edit-key': 'n4q8w2e7r5t3y6u9i2o5' }
+});</code></pre></div>
+  <div class="tw"><table><tr><th>Status</th><th>Body</th><th>When</th></tr>
+  <tr><td>200</td><td><code>{"ok":true}</code></td><td>Deleted.</td></tr>
+  <tr><td>403</td><td><code>{"error":"Wrong edit key."}</code></td><td>Key missing or not matching.</td></tr>
+  <tr><td>404</td><td><code>{"error":"Not found."}</code></td><td>No page with that id.</td></tr></table></div>
+  <p style="margin-top:14px">Copies of <code>/p</code> and <code>/r</code> are cacheable for up to 5 minutes, so a browser or cache that already has the page may keep showing it briefly.</p>
+</section>
+
+<section id="preview" data-sec>
+  <h2 class="eh"><i class="mt">GET</i><code>/p/:id</code></h2>
+  <p>The shareable page. <code>HEAD</code> works too.</p>
+  <div class="tw"><table><tr><th>Type</th><th>What you get</th></tr>
+  <tr><td>html</td><td>The stored source, served as written. Scripts run, but inside a sandbox with an opaque origin, so the page cannot read cookies or storage from Tack or from other pages.</td></tr>
+  <tr><td>md</td><td>Rendered on the server into a clean reading page. Works with no JavaScript.</td></tr>
+  <tr><td>txt</td><td>Shown as preformatted text in the same reading page.</td></tr></table></div>
+  <p style="margin-top:14px">Success responses carry <code>cache-control: public, max-age=300</code>, <code>x-content-type-options: nosniff</code> and <code>referrer-policy: no-referrer</code>. An unknown id returns a <code>404</code> HTML page.</p>
+</section>
+
+<section id="raw" data-sec>
+  <h2 class="eh"><i class="mt">GET</i><code>/r/:id</code></h2>
+  <p>The source, byte for byte, as <code>text/plain; charset=utf-8</code>. This is the link to hand to a script. <code>HEAD</code> works too.</p>
+  <div class="ex" data-l="curl"><button class="cp">Copy</button><pre><code>curl <span class="bu">https://tack.nullstacks.workers.dev</span>/r/k3m9x2qpa7</code></pre></div>
+  <div class="ex" data-l="js"><button class="cp">Copy</button><pre><code>const source = await (await fetch('<span class="bu">https://tack.nullstacks.workers.dev</span>/r/k3m9x2qpa7')).text();</code></pre></div>
+  <p>Sent with <code>content-length</code>, <code>x-content-type-options: nosniff</code>, <code>cache-control: public, max-age=300</code> and <code>access-control-allow-origin: *</code>, so browsers on any origin can fetch it. Raw source is never served as HTML.</p>
+</section>
+
+<section id="health" data-sec>
+  <h2 class="eh"><i class="mt">GET</i><code>/health</code></h2>
+  <p>A liveness check for monitors.</p>
+  <div class="ex"><button class="cp">Copy</button><pre><code>{ "ok": true, "service": "tack", "ts": 1795000000000 }</code></pre></div>
+</section>
+
+<section id="errors" data-sec>
+  <h2>Errors &amp; limits</h2>
+  <p>Errors from <code>/api/*</code> are JSON with an <code>error</code> message for people and, for some, a <code>code</code> for programs.</p>
+  <div class="tw"><table><tr><th>Status</th><th>Body</th><th>Cause</th></tr>
+  <tr><td>400</td><td><code>Expected a JSON body.</code></td><td>The request body was not valid JSON.</td></tr>
+  <tr><td>400</td><td><code>Nothing to deploy.</code></td><td><code>content</code> missing, not a string, or blank.</td></tr>
+  <tr><td>413</td><td><code>code: "too_large"</code></td><td>Content is over 1 MB.</td></tr>
+  <tr><td>429</td><td><code>code: "rate_limited"</code></td><td>More than 30 deploys in a minute from one IP. Wait for the <code>retry-after</code> header (60 seconds).</td></tr>
+  <tr><td>405</td><td><code>Method not allowed.</code></td><td>Wrong HTTP method for the route.</td></tr>
+  <tr><td>500</td><td><code>Could not save that page.</code></td><td>Storage failed. Safe to retry.</td></tr></table></div>
+  <h3>Browsers and CORS</h3>
+  <p><code>OPTIONS</code> requests to <code>/api/*</code> answer <code>204</code> and allow <code>GET</code>, <code>POST</code>, <code>DELETE</code> and the <code>content-type</code> and <code>x-edit-key</code> headers. <code>GET /r/:id</code> is open to every origin. Servers, scripts and curl are not affected by CORS at all.</p>
+</section>
+<p class="fin">Tack is open source under the MIT license. <a href="https://github.com/nullstacks/tack">github.com/nullstacks/tack</a></p>
+</main>
+</div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s),R=document.documentElement;
+try{const t=localStorage.getItem('tack:theme');if(t)R.dataset.theme=t}catch{}
+const I={sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/>',moon:'<path d="M20 14A8 8 0 0 1 10 4a8 8 0 1 0 10 10z"/>'};
+const ic=n=>`<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
+const dark=()=>R.dataset.theme?R.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;
+const ti=()=>$$('.th').forEach(b=>b.innerHTML=ic(dark()?'sun':'moon'));
+$$('.bu').forEach(e=>e.textContent=location.origin);
+function setLang(l){R.dataset.lang=l;$$('.seg button').forEach(b=>b.setAttribute('aria-checked',b.dataset.l===l));try{localStorage.setItem('tack:lang',l)}catch{}}
+async function copy(s){try{await navigator.clipboard.writeText(s)}catch{const a=document.createElement('textarea');a.value=s;a.style.cssText='position:fixed;opacity:0';document.body.append(a);a.select();try{document.execCommand('copy')}catch{}a.remove()}}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tt],.seg button,.cp');if(!b)return;
+ if(b.hasAttribute('data-tt')){R.dataset.theme=dark()?'light':'dark';try{localStorage.setItem('tack:theme',R.dataset.theme)}catch{}ti()}
+ else if(b.dataset.l)setLang(b.dataset.l);
+ else{const src=b.dataset.cp?$(b.dataset.cp):b.parentElement.querySelector('code');copy(src.textContent);const t=b.textContent;b.textContent='Copied';setTimeout(()=>b.textContent=t,1400)}});
+let lang='curl';try{lang=localStorage.getItem('tack:lang')||'curl'}catch{}
+ti();setLang(lang);
+const links=[...$$('.toc a')];
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id))}),{rootMargin:'-15% 0px -75% 0px'});
+$$('[data-sec]').forEach(s=>io.observe(s));
+</script>
+</body>
+</html>
